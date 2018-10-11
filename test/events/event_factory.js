@@ -1,5 +1,5 @@
 const AddressManager = artifacts.require('./storage/AddressManager.sol');
-const BodhiToken = artifacts.require('./tokens/BodhiToken.sol');
+const RunebasePredictionToken = artifacts.require('./tokens/RunebasePredictionToken.sol');
 const EventFactory = artifacts.require('./events/EventFactory.sol');
 const TopicEvent = artifacts.require('./events/TopicEvent.sol');
 const OracleFactory = artifacts.require('./oracles/OracleFactory.sol');
@@ -47,7 +47,7 @@ contract('EventFactory', (accounts) => {
 
     const baseContracts = await ContractHelper.initBaseContracts(ADMIN, accounts);
     addressManager = baseContracts.addressManager;
-    token = baseContracts.bodhiToken;
+    token = baseContracts.runebasepredictionToken;
     eventFactory = baseContracts.eventFactory;
     oracleFactory = baseContracts.oracleFactory;
 

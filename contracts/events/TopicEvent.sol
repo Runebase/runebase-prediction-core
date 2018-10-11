@@ -15,8 +15,8 @@ contract TopicEvent is ITopicEvent, BaseContract, Ownable {
 
     /*
     * @notice Status types
-    *   Betting: Bet with QTUM during this phase.
-    *   Arbitration: Vote with BOT during this phase.
+    *   Betting: Bet with RUNEBASE during this phase.
+    *   Arbitration: Vote with PRED during this phase.
     *   Collection: Winners collect their winnings during this phase.
     */
     enum Status {
@@ -30,15 +30,15 @@ contract TopicEvent is ITopicEvent, BaseContract, Ownable {
         bool didSetResult;
     }
 
-    // Amount of QTUM to be distributed to BOT winners
-    uint8 public constant QTUM_PERCENTAGE = 1;
+    // Amount of RUNEBASE to be distributed to PRED winners
+    uint8 public constant RUNEBASE_PERCENTAGE = 1;
 
     Status public status = Status.Betting;
     bool public escrowWithdrawn;
     bytes32[10] public eventName;
     bytes32[11] public eventResults;
-    uint256 public totalQtumValue;
-    uint256 public totalBotValue;
+    uint256 public totalRunebaseValue;
+    uint256 public totalPredValue;
     uint256 public escrowAmount;
     IAddressManager private addressManager;
     Oracle[] public oracles;
@@ -52,8 +52,8 @@ contract TopicEvent is ITopicEvent, BaseContract, Ownable {
     event WinningsWithdrawn(
         uint16 indexed _version, 
         address indexed _winner, 
-        uint256 _qtumTokenWon, 
-        uint256 _botTokenWon);
+        uint256 _runebaseTokenWon, 
+        uint256 _predTokenWon);
 
     // Modifiers
     modifier fromCentralizedOracle() {
@@ -77,7 +77,7 @@ contract TopicEvent is ITopicEvent, BaseContract, Ownable {
     * @param _bettingEndTime The unix time when betting will end.
     * @param _resultSettingStartTime The unix time when the CentralizedOracle can set the result.
     * @param _resultSettingEndTime The unix time when anyone can set the result.
-    * @param _escrowAmount The amount of BOT deposited to create the Event.
+    * @param _escrowAmount The amount of PRED deposited to create the Event.
     * @param _addressManager The address of the AddressManager.
     */
     constructor(
@@ -137,14 +137,14 @@ contract TopicEvent is ITopicEvent, BaseContract, Ownable {
 
         balances[_resultIndex].totalBets = balances[_resultIndex].totalBets.add(msg.value);
         balances[_resultIndex].bets[_better] = balances[_resultIndex].bets[_better].add(msg.value);
-        totalQtumValue = totalQtumValue.add(msg.value);
+        totalRunebaseValue = totalRunebaseValue.add(msg.value);
     }
 
     /* 
     * @dev CentralizedOracle contract can call this method to set the result.
     * @param _oracle The address of the CentralizedOracle.
     * @param _resultIndex The index of the result to set.
-    * @param _consensusThreshold The BOT threshold that the CentralizedOracle has to contribute to validate the result.
+    * @param _consensusThreshold The PRED threshold that the CentralizedOracle has to contribute to validate the result.
     */
     function centralizedOracleSetResult(
         address _oracle, 
@@ -157,7 +157,7 @@ contract TopicEvent is ITopicEvent, BaseContract, Ownable {
         require(!oracles[0].didSetResult);
         require(status == Status.Betting);
 
-        ERC20 token = ERC20(addressManager.bodhiTokenAddress());
+        ERC20 token = ERC20(addressManager.runebasepredictionTokenAddress());
         require(token.allowance(_oracle, address(this)) >= _consensusThreshold);
 
         oracles[0].didSetResult = true;
@@ -166,7 +166,7 @@ contract TopicEvent is ITopicEvent, BaseContract, Ownable {
 
         balances[_resultIndex].totalVotes = balances[_resultIndex].totalVotes.add(_consensusThreshold);
         balances[_resultIndex].votes[_oracle] = balances[_resultIndex].votes[_oracle].add(_consensusThreshold);
-        totalBotValue = totalBotValue.add(_consensusThreshold);
+        totalPredValue = totalPredValue.add(_consensusThreshold);
 
         token.transferFrom(_oracle, address(this), _consensusThreshold);
 
@@ -175,11 +175,11 @@ contract TopicEvent is ITopicEvent, BaseContract, Ownable {
     }
 
     /*
-    * @dev DecentralizedOracle contract can call this method to vote for a user. Voter must BOT approve() with the 
+    * @dev DecentralizedOracle contract can call this method to vote for a user. Voter must PRED approve() with the 
     *   amount to TopicEvent address before voting.
     * @param _resultIndex The index of result to vote on.
     * @param _sender The address of the person voting on a result.
-    * @param _amount The BOT amount used to vote.
+    * @param _amount The PRED amount used to vote.
     * @return Flag indicating a successful transfer.
     */
     function voteFromOracle(uint8 _resultIndex, address _sender, uint256 _amount)
@@ -197,12 +197,12 @@ contract TopicEvent is ITopicEvent, BaseContract, Ownable {
         require(isValidOracle);
         require(_amount > 0);
 
-        ERC20 token = ERC20(addressManager.bodhiTokenAddress());
+        ERC20 token = ERC20(addressManager.runebasepredictionTokenAddress());
         require(token.allowance(_sender, address(this)) >= _amount);
 
         balances[_resultIndex].totalVotes = balances[_resultIndex].totalVotes.add(_amount);
         balances[_resultIndex].votes[_sender] = balances[_resultIndex].votes[_sender].add(_amount);
-        totalBotValue = totalBotValue.add(_amount);
+        totalPredValue = totalPredValue.add(_amount);
 
         return token.transferFrom(_sender, address(this), _amount);
     }
@@ -255,7 +255,7 @@ contract TopicEvent is ITopicEvent, BaseContract, Ownable {
     }
 
     /*
-    * @notice Allows winners of the Event to withdraw their QTUM and BOT winnings after the final result is set.
+    * @notice Allows winners of the Event to withdraw their RUNEBASE and PRED winnings after the final result is set.
     */
     function withdrawWinnings() 
         external 
@@ -265,18 +265,18 @@ contract TopicEvent is ITopicEvent, BaseContract, Ownable {
 
         didWithdraw[msg.sender] = true;
 
-        uint256 botWon;
-        uint256 qtumWon;
-        (botWon, qtumWon) = calculateWinnings();
+        uint256 predWon;
+        uint256 runebaseWon;
+        (predWon, runebaseWon) = calculateWinnings();
 
-        if (qtumWon > 0) {
-            msg.sender.transfer(qtumWon);
+        if (runebaseWon > 0) {
+            msg.sender.transfer(runebaseWon);
         }
-        if (botWon > 0) {
-            ERC20(addressManager.bodhiTokenAddress()).transfer(msg.sender, botWon);
+        if (predWon > 0) {
+            ERC20(addressManager.runebasepredictionTokenAddress()).transfer(msg.sender, predWon);
         }
 
-        emit WinningsWithdrawn(version, msg.sender, qtumWon, botWon);
+        emit WinningsWithdrawn(version, msg.sender, runebaseWon, predWon);
     }
 
     /*
@@ -307,8 +307,8 @@ contract TopicEvent is ITopicEvent, BaseContract, Ownable {
     }
 
     /* 
-    * @notice Calculates the BOT and QTUM tokens won based on the sender's contributions.
-    * @return The amount of BOT and QTUM tokens won.
+    * @notice Calculates the PRED and RUNEBASE tokens won based on the sender's contributions.
+    * @return The amount of PRED and RUNEBASE tokens won.
     */
     function calculateWinnings()
         public 
@@ -319,26 +319,26 @@ contract TopicEvent is ITopicEvent, BaseContract, Ownable {
         uint256 votes = balances[resultIndex].votes[msg.sender];
         uint256 bets = balances[resultIndex].bets[msg.sender];
 
-        // Calculate Qtum reward total
+        // Calculate Runebase reward total
         uint256 losersTotal = 0;
         for (uint8 i = 0; i < numOfResults; i++) {
             if (i != resultIndex) {
                 losersTotal = losersTotal.add(balances[i].totalBets);
             }
         }
-        uint256 rewardQtum = uint256(QTUM_PERCENTAGE).mul(losersTotal).div(100);
-        losersTotal = losersTotal.sub(rewardQtum);
+        uint256 rewardRunebase = uint256(RUNEBASE_PERCENTAGE).mul(losersTotal).div(100);
+        losersTotal = losersTotal.sub(rewardRunebase);
 
-        // Calculate QTUM winnings
+        // Calculate RUNEBASE winnings
         uint256 winnersTotal;
-        uint256 qtumWon = 0;
+        uint256 runebaseWon = 0;
         if (bets > 0) {
             winnersTotal = balances[resultIndex].totalBets;
-            qtumWon = bets.mul(losersTotal).div(winnersTotal).add(bets);
+            runebaseWon = bets.mul(losersTotal).div(winnersTotal).add(bets);
         }
 
-        // Calculate BOT winnings
-        uint256 botWon = 0;
+        // Calculate PRED winnings
+        uint256 predWon = 0;
         if (votes > 0) {
             winnersTotal = balances[resultIndex].totalVotes;
             losersTotal = 0;
@@ -347,12 +347,12 @@ contract TopicEvent is ITopicEvent, BaseContract, Ownable {
                     losersTotal = losersTotal.add(balances[i].totalVotes);
                 }
             }
-            botWon = votes.mul(losersTotal).div(winnersTotal).add(votes);
-            uint256 rewardWon = votes.mul(rewardQtum).div(winnersTotal);
-            qtumWon = qtumWon.add(rewardWon);
+            predWon = votes.mul(losersTotal).div(winnersTotal).add(votes);
+            uint256 rewardWon = votes.mul(rewardRunebase).div(winnersTotal);
+            runebaseWon = runebaseWon.add(rewardWon);
         }
 
-        return (botWon, qtumWon);
+        return (predWon, runebaseWon);
     }
 
     function createCentralizedOracle(

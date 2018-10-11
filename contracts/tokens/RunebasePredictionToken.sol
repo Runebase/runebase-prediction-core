@@ -3,18 +3,18 @@ pragma solidity ^0.4.17;
 import './StandardToken.sol';
 import '../libs/Ownable.sol';
 
-contract BodhiToken is StandardToken, Ownable {
+contract RunebasePredictionToken is StandardToken, Ownable {
     // Token configurations
-    string public constant name = "Bodhi Token";
-    string public constant symbol = "BOT";
+    string public constant name = "Runebase Prediction Token";
+    string public constant symbol = "PRED";
     uint256 public constant decimals = 8;
 
-    uint256 public constant tokenTotalSupply = 100 * (10**6) * (10**decimals); // 100 million BOT ever created
+    uint256 public constant tokenTotalSupply = 100 * (10**6) * (10**decimals); // 100 million PRED ever created
 
     // Events
     event Mint(uint256 supply, address indexed to, uint256 amount);
 
-    /// @notice Creates new BodhiToken contract
+    /// @notice Creates new RunebasePredictionToken contract
     constructor() Ownable(msg.sender) public {
     }
 

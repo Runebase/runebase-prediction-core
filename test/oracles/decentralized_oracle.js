@@ -1,7 +1,7 @@
 const web3 = global.web3;
 const assert = require('chai').assert;
 
-const BodhiToken = artifacts.require('./tokens/BodhiToken.sol');
+const RunebasePredictionToken = artifacts.require('./tokens/RunebasePredictionToken.sol');
 const AddressManager = artifacts.require('./storage/AddressManager.sol');
 const EventFactory = artifacts.require('./events/EventFactory.sol');
 const TopicEvent = artifacts.require('./events/TopicEvent.sol');
@@ -29,7 +29,7 @@ function getTopicParams(oracle) {
 contract('DecentralizedOracle', (accounts) => {
   const timeMachine = new TimeMachine(web3);
 
-  const BOT_DECIMALS = 8;
+  const PRED_DECIMALS = 8;
   const ADMIN = accounts[0];
   const ORACLE = accounts[1];
   const USER1 = accounts[2];
@@ -56,7 +56,7 @@ contract('DecentralizedOracle', (accounts) => {
   before(async () => {
     const baseContracts = await ContractHelper.initBaseContracts(ADMIN, accounts);
     addressManager = baseContracts.addressManager;
-    token = baseContracts.bodhiToken;
+    token = baseContracts.runebasepredictionToken;
     eventFactory = baseContracts.eventFactory;
     oracleFactory = baseContracts.oracleFactory;
 
@@ -83,21 +83,21 @@ contract('DecentralizedOracle', (accounts) => {
     assert.isAtLeast(Utils.getCurrentBlockTime(), topicParams._bettingStartTime);
     assert.isBelow(Utils.getCurrentBlockTime(), topicParams._bettingEndTime);
 
-    const bet1 = Utils.getBigNumberWithDecimals(20, BOT_DECIMALS);
+    const bet1 = Utils.getBigNumberWithDecimals(20, PRED_DECIMALS);
     await centralizedOracle.bet(CENTRALIZED_ORACLE_RESULT, {
       from: USER1,
       value: bet1,
     });
     SolAssert.assertBNEqual((await topicEvent.getBetBalances({ from: USER1 }))[CENTRALIZED_ORACLE_RESULT], bet1);
 
-    const bet2 = Utils.getBigNumberWithDecimals(30, BOT_DECIMALS);
+    const bet2 = Utils.getBigNumberWithDecimals(30, PRED_DECIMALS);
     await centralizedOracle.bet(CENTRALIZED_ORACLE_RESULT, {
       from: USER2,
       value: bet2,
     });
     SolAssert.assertBNEqual((await topicEvent.getBetBalances({ from: USER2 }))[CENTRALIZED_ORACLE_RESULT], bet2);
 
-    const bet3 = Utils.getBigNumberWithDecimals(11, BOT_DECIMALS);
+    const bet3 = Utils.getBigNumberWithDecimals(11, PRED_DECIMALS);
     await centralizedOracle.bet(0, {
       from: USER3,
       value: bet3,
@@ -125,7 +125,7 @@ contract('DecentralizedOracle', (accounts) => {
   });
 
   describe('constructor', () => {
-    const consensusThreshold = Utils.getBigNumberWithDecimals(100, BOT_DECIMALS);
+    const consensusThreshold = Utils.getBigNumberWithDecimals(100, PRED_DECIMALS);
     let arbitrationEndTime;
 
     beforeEach(() => {
@@ -200,12 +200,12 @@ contract('DecentralizedOracle', (accounts) => {
     it('allows voting', async () => {
       assert.isBelow(Utils.getCurrentBlockTime(), (await decentralizedOracle.arbitrationEndTime.call()).toNumber());
 
-      const vote1 = Utils.getBigNumberWithDecimals(7, BOT_DECIMALS);
+      const vote1 = Utils.getBigNumberWithDecimals(7, PRED_DECIMALS);
       await ContractHelper.approve(token, USER1, topicEvent.address, vote1);
       await decentralizedOracle.voteResult(0, vote1, { from: USER1 });
       SolAssert.assertBNEqual((await decentralizedOracle.getVoteBalances({ from: USER1 }))[0], vote1);
 
-      const vote2 = Utils.getBigNumberWithDecimals(5, BOT_DECIMALS);
+      const vote2 = Utils.getBigNumberWithDecimals(5, PRED_DECIMALS);
       await ContractHelper.approve(token, USER2, topicEvent.address, vote2);
       await decentralizedOracle.voteResult(2, vote2, { from: USER2 });
       SolAssert.assertBNEqual((await decentralizedOracle.getVoteBalances({ from: USER2 }))[2], vote2);
@@ -258,7 +258,7 @@ contract('DecentralizedOracle', (accounts) => {
     it('throws if eventResultIndex is invalid', async () => {
       assert.isBelow(Utils.getCurrentBlockTime(), (await decentralizedOracle.arbitrationEndTime.call()).toNumber());
 
-      const vote1 = Utils.getBigNumberWithDecimals(7, BOT_DECIMALS);
+      const vote1 = Utils.getBigNumberWithDecimals(7, PRED_DECIMALS);
       await ContractHelper.approve(token, USER1, topicEvent.address, vote1);
       try {
         await decentralizedOracle.voteResult(CENTRALIZED_ORACLE_RESULT, vote1, { from: USER1 });
@@ -278,7 +278,7 @@ contract('DecentralizedOracle', (accounts) => {
       assert.isTrue(await decentralizedOracle.finished.call());
       assert.equal((await decentralizedOracle.resultIndex.call()).toNumber(), CENTRALIZED_ORACLE_RESULT);
 
-      const vote1 = Utils.getBigNumberWithDecimals(7, BOT_DECIMALS);
+      const vote1 = Utils.getBigNumberWithDecimals(7, PRED_DECIMALS);
       await ContractHelper.approve(token, USER1, topicEvent.address, vote1);
       try {
         await decentralizedOracle.voteResult(0, vote1, { from: USER1 });
@@ -288,7 +288,7 @@ contract('DecentralizedOracle', (accounts) => {
       }
     });
 
-    it('throws if botAmount is 0', async () => {
+    it('throws if predAmount is 0', async () => {
       assert.isBelow(Utils.getCurrentBlockTime(), (await decentralizedOracle.arbitrationEndTime.call()).toNumber());
 
       try {
@@ -304,7 +304,7 @@ contract('DecentralizedOracle', (accounts) => {
       await timeMachine.increaseTime(arbitrationEndTime - Utils.getCurrentBlockTime());
       assert.isAtLeast(Utils.getCurrentBlockTime(), arbitrationEndTime);
 
-      const vote1 = Utils.getBigNumberWithDecimals(7, BOT_DECIMALS);
+      const vote1 = Utils.getBigNumberWithDecimals(7, PRED_DECIMALS);
       await ContractHelper.approve(token, USER1, topicEvent.address, vote1);
 
       try {
@@ -318,7 +318,7 @@ contract('DecentralizedOracle', (accounts) => {
     it('throws if the voting on the lastResultIndex', async () => {
       const lastResultIndex = (await decentralizedOracle.lastResultIndex.call()).toNumber();
 
-      const vote1 = Utils.getBigNumberWithDecimals(7, BOT_DECIMALS);
+      const vote1 = Utils.getBigNumberWithDecimals(7, PRED_DECIMALS);
       await ContractHelper.approve(token, USER1, topicEvent.address, vote1);
 
       try {
@@ -384,12 +384,12 @@ contract('DecentralizedOracle', (accounts) => {
       const arbitrationEndTime = (await decentralizedOracle.arbitrationEndTime.call()).toNumber();
       assert.isBelow(Utils.getCurrentBlockTime(), arbitrationEndTime);
 
-      const vote1 = Utils.getBigNumberWithDecimals(10, BOT_DECIMALS);
+      const vote1 = Utils.getBigNumberWithDecimals(10, PRED_DECIMALS);
       await ContractHelper.approve(token, USER1, topicEvent.address, vote1);
       await decentralizedOracle.voteResult(0, vote1, { from: USER1 });
       SolAssert.assertBNEqual((await decentralizedOracle.getVoteBalances({ from: USER1 }))[0], vote1);
 
-      const vote2 = Utils.getBigNumberWithDecimals(17, BOT_DECIMALS);
+      const vote2 = Utils.getBigNumberWithDecimals(17, PRED_DECIMALS);
       await ContractHelper.approve(token, USER2, topicEvent.address, vote2);
       await decentralizedOracle.voteResult(2, vote2, { from: USER2 });
       SolAssert.assertBNEqual((await decentralizedOracle.getVoteBalances({ from: USER2 }))[2], vote2);
@@ -401,11 +401,11 @@ contract('DecentralizedOracle', (accounts) => {
       const arbitrationEndTime = (await decentralizedOracle.arbitrationEndTime.call()).toNumber();
       assert.isBelow(Utils.getCurrentBlockTime(), arbitrationEndTime);
 
-      const vote1 = Utils.getBigNumberWithDecimals(10, BOT_DECIMALS);
+      const vote1 = Utils.getBigNumberWithDecimals(10, PRED_DECIMALS);
       await ContractHelper.approve(token, USER1, topicEvent.address, vote1);
       await decentralizedOracle.voteResult(0, vote1, { from: USER1 });
 
-      const vote2 = Utils.getBigNumberWithDecimals(17, BOT_DECIMALS);
+      const vote2 = Utils.getBigNumberWithDecimals(17, PRED_DECIMALS);
       await ContractHelper.approve(token, USER2, topicEvent.address, vote2);
       await decentralizedOracle.voteResult(0, vote2, { from: USER2 });
 

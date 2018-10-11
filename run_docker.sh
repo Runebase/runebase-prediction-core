@@ -4,10 +4,10 @@
 docker version
 
 # build the image based on the Dockerfile and name it `nvm`
-docker build -t bodhi_core .
+docker build -t runebaseprediction_core .
 
 # confirm image is present
 docker images
 
 # enter container terminal
-docker run -it bodhi_core bash
+docker run -it runebaseprediction_core bash

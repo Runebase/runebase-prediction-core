@@ -20,7 +20,7 @@ contract CentralizedOracle is Oracle {
     * @param _bettingEndTime The unix time when betting will end.
     * @param _resultSettingStartTime The unix time when the CentralizedOracle can set the result.
     * @param _resultSettingEndTime The unix time when anyone can set the result.
-    * @param _consensusThreshold The BOT amount that needs to be paid by the Oracle for their result to be valid.
+    * @param _consensusThreshold The PRED amount that needs to be paid by the Oracle for their result to be valid.
     */
     constructor(
         uint16 _version,
@@ -78,11 +78,11 @@ contract CentralizedOracle is Oracle {
         balances[_resultIndex].bets[msg.sender] = balances[_resultIndex].bets[msg.sender].add(msg.value);
 
         ITopicEvent(eventAddress).betFromOracle.value(msg.value)(msg.sender, _resultIndex);
-        emit OracleResultVoted(version, address(this), msg.sender, _resultIndex, msg.value, QTUM);
+        emit OracleResultVoted(version, address(this), msg.sender, _resultIndex, msg.value, RUNEBASE);
     }
 
     /* 
-    * @notice CentralizedOracle should call this to set the result. Requires the Oracle to approve() BOT in the amount 
+    * @notice CentralizedOracle should call this to set the result. Requires the Oracle to approve() PRED in the amount 
     *   of the consensus threshold.
     * @param _resultIndex The index of the result to set.
     */
@@ -104,7 +104,7 @@ contract CentralizedOracle is Oracle {
             .add(consensusThreshold);
 
         ITopicEvent(eventAddress).centralizedOracleSetResult(msg.sender, _resultIndex, consensusThreshold);
-        emit OracleResultVoted(version, address(this), msg.sender, _resultIndex, consensusThreshold, BOT);
+        emit OracleResultVoted(version, address(this), msg.sender, _resultIndex, consensusThreshold, PRED);
         emit OracleResultSet(version, address(this), _resultIndex);
     }
 }

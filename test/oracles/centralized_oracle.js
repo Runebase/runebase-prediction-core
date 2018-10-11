@@ -2,7 +2,7 @@ const web3 = global.web3;
 const assert = require('chai').assert;
 const bluebird = require('bluebird');
 
-const BodhiToken = artifacts.require('./tokens/BodhiToken.sol');
+const RunebasePredictionToken = artifacts.require('./tokens/RunebasePredictionToken.sol');
 const AddressManager = artifacts.require('./storage/AddressManager.sol');
 const EventFactory = artifacts.require('./events/EventFactory.sol');
 const OracleFactory = artifacts.require('./oracles/OracleFactory.sol');
@@ -32,7 +32,7 @@ contract('CentralizedOracle', (accounts) => {
   const timeMachine = new TimeMachine(web3);
 
   const NATIVE_DECIMALS = 8;
-  const BOT_DECIMALS = 8;
+  const PRED_DECIMALS = 8;
 
   const ADMIN = accounts[0];
   const OWNER = accounts[1];
@@ -57,7 +57,7 @@ contract('CentralizedOracle', (accounts) => {
   before(async () => {
     const baseContracts = await ContractHelper.initBaseContracts(ADMIN, accounts);
     addressManager = baseContracts.addressManager;
-    token = baseContracts.bodhiToken;
+    token = baseContracts.runebasepredictionToken;
     eventFactory = baseContracts.eventFactory;
     oracleFactory = baseContracts.oracleFactory;
   });

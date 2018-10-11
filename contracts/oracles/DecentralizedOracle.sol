@@ -14,7 +14,7 @@ contract DecentralizedOracle is Oracle {
     * @param _numOfResults The number of result options.
     * @param _lastResultIndex The last result index set by the DecentralizedOracle.
     * @param _arbitrationEndTime The unix time when the voting period ends.
-    * @param _consensusThreshold The BOT amount that needs to be reached for this DecentralizedOracle to be valid.
+    * @param _consensusThreshold The PRED amount that needs to be reached for this DecentralizedOracle to be valid.
     */
     constructor(
         uint16 _version,
@@ -41,22 +41,22 @@ contract DecentralizedOracle is Oracle {
     }
 
     /*
-    * @notice Vote on an Event result which requires BOT payment.
+    * @notice Vote on an Event result which requires PRED payment.
     * @param _eventResultIndex The Event result which is being voted on.
-    * @param _botAmount The amount of BOT used to vote.
+    * @param _predAmount The amount of PRED used to vote.
     */
-    function voteResult(uint8 _eventResultIndex, uint256 _botAmount) 
+    function voteResult(uint8 _eventResultIndex, uint256 _predAmount) 
         external 
         validResultIndex(_eventResultIndex) 
         isNotFinished()
     {
-        require(_botAmount > 0);
+        require(_predAmount > 0);
         require(block.timestamp < arbitrationEndTime);
         require(_eventResultIndex != lastResultIndex);
 
         // Only accept the vote amount up to the consensus threshold
-        uint256 adjustedVoteAmount = _botAmount;
-        if (balances[_eventResultIndex].totalVotes.add(_botAmount) > consensusThreshold) {
+        uint256 adjustedVoteAmount = _predAmount;
+        if (balances[_eventResultIndex].totalVotes.add(_predAmount) > consensusThreshold) {
             adjustedVoteAmount = consensusThreshold.sub(balances[_eventResultIndex].totalVotes);
         }
 
@@ -65,7 +65,7 @@ contract DecentralizedOracle is Oracle {
             .add(adjustedVoteAmount);
 
         ITopicEvent(eventAddress).voteFromOracle(_eventResultIndex, msg.sender, adjustedVoteAmount);
-        emit OracleResultVoted(version, address(this), msg.sender, _eventResultIndex, adjustedVoteAmount, BOT);
+        emit OracleResultVoted(version, address(this), msg.sender, _eventResultIndex, adjustedVoteAmount, PRED);
 
         if (balances[_eventResultIndex].totalVotes >= consensusThreshold) {
             setResult();

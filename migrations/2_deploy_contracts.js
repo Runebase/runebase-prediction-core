@@ -1,4 +1,4 @@
-const BodhiToken = artifacts.require("./tokens/BodhiToken.sol");
+const RunebasePredictionToken = artifacts.require("./tokens/RunebasePredictionToken.sol");
 const AddressManager = artifacts.require("./addressmanager/AddressManager.sol");
 const EventFactory = artifacts.require("./events/EventFactory.sol");
 const OracleFactory = artifacts.require("./oracles/OracleFactory.sol");
@@ -8,7 +8,7 @@ const TopicEvent = artifacts.require("./events/TopicEvent.sol");
 const DecentralizedOracle = artifacts.require("./oracles/DecentralizedOracle.sol");
 
 module.exports = function(deployer) {
-    deployer.deploy(BodhiToken);
+    deployer.deploy(RunebasePredictionToken);
 
     deployer.deploy(SafeMath);
     deployer.link(SafeMath, [TopicEvent, DecentralizedOracle]);

@@ -3,7 +3,7 @@ pragma solidity ^0.4.18;
 contract IAddressManager {
     uint16 public currentEventFactoryIndex;
     uint16 public currentOracleFactoryIndex;
-    address public bodhiTokenAddress;
+    address public runebasepredictionTokenAddress;
     uint256 public eventEscrowAmount;
     uint256 public arbitrationLength;
     uint256 public startingOracleThreshold;
@@ -14,7 +14,7 @@ contract IAddressManager {
     function transferEscrow(address _creator) external;
     function withdrawEscrow(address _creator, uint256 _escrowAmount) external;
     function addWhitelistContract(address _contractAddress) external;
-    function setBodhiTokenAddress(address _tokenAddress) public;
+    function setRunebasePredictionTokenAddress(address _tokenAddress) public;
     function getLastEventFactoryIndex() public view returns (uint16 lastEventFactoryIndex);
     function getLastOracleFactoryIndex() public view returns (uint16 lastOracleFactoryIndex);
 }

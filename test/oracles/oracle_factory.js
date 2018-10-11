@@ -34,13 +34,13 @@ function getDOracleParams(arbitrationEndTime, consensusThreshold) {
 }
 
 contract('OracleFactory', (accounts) => {
-  const BOT_DECIMALS = 8;
+  const PRED_DECIMALS = 8;
 
   const ADMIN = accounts[0];
   const ORACLE = accounts[1];
   const USER1 = accounts[2];
 
-  const CONSENSUS_THRESHOLD = Utils.getBigNumberWithDecimals(100, BOT_DECIMALS);
+  const CONSENSUS_THRESHOLD = Utils.getBigNumberWithDecimals(100, PRED_DECIMALS);
 
   const timeMachine = new TimeMachine(web3);
   let addressManager;

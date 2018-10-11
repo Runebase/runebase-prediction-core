@@ -30,42 +30,42 @@ contract('AdddressManager', (accounts) => {
     addressManager = await AdddressManager.deployed({ from: OWNER });
   });
 
-  describe('BodhiTokenAddress', () => {
+  describe('RunebasePredictionTokenAddress', () => {
     it('should return the correct address if set', async () => {
-      assert.equal(await addressManager.bodhiTokenAddress.call(), 0);
+      assert.equal(await addressManager.runebasepredictionTokenAddress.call(), 0);
 
-      await addressManager.setBodhiTokenAddress(tokenAddress1, { from: OWNER });
-      assert.equal(await addressManager.bodhiTokenAddress.call(), tokenAddress1);
+      await addressManager.setRunebasePredictionTokenAddress(tokenAddress1, { from: OWNER });
+      assert.equal(await addressManager.runebasepredictionTokenAddress.call(), tokenAddress1);
     });
 
     it('allows replacing an existing address', async () => {
-      assert.equal(await addressManager.bodhiTokenAddress.call(), 0);
+      assert.equal(await addressManager.runebasepredictionTokenAddress.call(), 0);
 
-      await addressManager.setBodhiTokenAddress(tokenAddress1, { from: OWNER });
-      assert.equal(await addressManager.bodhiTokenAddress.call(), tokenAddress1);
+      await addressManager.setRunebasePredictionTokenAddress(tokenAddress1, { from: OWNER });
+      assert.equal(await addressManager.runebasepredictionTokenAddress.call(), tokenAddress1);
 
-      await addressManager.setBodhiTokenAddress(tokenAddress2, { from: OWNER });
-      assert.equal(await addressManager.bodhiTokenAddress.call(), tokenAddress2);
+      await addressManager.setRunebasePredictionTokenAddress(tokenAddress2, { from: OWNER });
+      assert.equal(await addressManager.runebasepredictionTokenAddress.call(), tokenAddress2);
     });
 
     it('throws if a non-OWNER tries setting the address', async () => {
-      assert.equal(await addressManager.bodhiTokenAddress.call(), 0);
+      assert.equal(await addressManager.runebasepredictionTokenAddress.call(), 0);
 
       try {
-        await addressManager.setBodhiTokenAddress(tokenAddress1, { from: accounts[1] });
+        await addressManager.setRunebasePredictionTokenAddress(tokenAddress1, { from: accounts[1] });
         assert.fail();
       } catch (e) {
         SolAssert.assertRevert(e);
       }
 
-      assert.equal(await addressManager.bodhiTokenAddress.call(), 0);
+      assert.equal(await addressManager.runebasepredictionTokenAddress.call(), 0);
     });
 
     it('throws if trying to set an invalid address', async () => {
-      assert.equal(await addressManager.bodhiTokenAddress.call(), 0);
+      assert.equal(await addressManager.runebasepredictionTokenAddress.call(), 0);
 
       try {
-        await addressManager.setBodhiTokenAddress(0, { from: OWNER });
+        await addressManager.setRunebasePredictionTokenAddress(0, { from: OWNER });
         assert.fail();
       } catch (e) {
         SolAssert.assertRevert(e);
@@ -258,13 +258,13 @@ contract('AdddressManager', (accounts) => {
   });
 
   describe('Escrow transfer/withdraw', () => {
-    let bodhiToken;
+    let runebasepredictionToken;
     let escrowAmount;
 
     beforeEach(async () => {
-      bodhiToken = await ContractHelper.mintBodhiTokens(OWNER, accounts);
-      await addressManager.setBodhiTokenAddress(bodhiToken.address, { from: OWNER });
-      assert.equal(await addressManager.bodhiTokenAddress.call(), bodhiToken.address);
+      runebasepredictionToken = await ContractHelper.mintRunebasePredictionTokens(OWNER, accounts);
+      await addressManager.setRunebasePredictionTokenAddress(runebasepredictionToken.address, { from: OWNER });
+      assert.equal(await addressManager.runebasepredictionTokenAddress.call(), runebasepredictionToken.address);
 
       await addressManager.setEventFactoryAddress(WHITELISTED_ADDRESS, { from: OWNER });
       assert.equal(await addressManager.eventFactoryVersionToAddress.call(0), WHITELISTED_ADDRESS);
@@ -273,13 +273,13 @@ contract('AdddressManager', (accounts) => {
     });
 
     it('can tranfer the escrow', async () => {
-      await ContractHelper.approve(bodhiToken, USER1, addressManager.address, escrowAmount);
+      await ContractHelper.approve(runebasepredictionToken, USER1, addressManager.address, escrowAmount);
       await addressManager.transferEscrow(USER1, { from: WHITELISTED_ADDRESS });
-      SolAssert.assertBNEqual(await bodhiToken.balanceOf(addressManager.address), escrowAmount);
+      SolAssert.assertBNEqual(await runebasepredictionToken.balanceOf(addressManager.address), escrowAmount);
     });
 
     it('throws if trying to transfer from a non-whitelisted address', async () => {
-      await ContractHelper.approve(bodhiToken, USER1, addressManager.address, escrowAmount);
+      await ContractHelper.approve(runebasepredictionToken, USER1, addressManager.address, escrowAmount);
 
       try {
         await addressManager.transferEscrow(USER1, { from: USER1 });
@@ -288,11 +288,11 @@ contract('AdddressManager', (accounts) => {
         SolAssert.assertRevert(e);
       }
 
-      SolAssert.assertBNEqual(await bodhiToken.balanceOf(addressManager.address), 0);
+      SolAssert.assertBNEqual(await runebasepredictionToken.balanceOf(addressManager.address), 0);
     });
 
     it('throws if trying to transfer without enough allowance', async () => {
-      await ContractHelper.approve(bodhiToken, USER1, addressManager.address, escrowAmount.sub(1));
+      await ContractHelper.approve(runebasepredictionToken, USER1, addressManager.address, escrowAmount.sub(1));
 
       try {
         await addressManager.transferEscrow(USER1, { from: WHITELISTED_ADDRESS });
@@ -301,26 +301,26 @@ contract('AdddressManager', (accounts) => {
         SolAssert.assertRevert(e);
       }
 
-      SolAssert.assertBNEqual(await bodhiToken.balanceOf(addressManager.address), 0);
+      SolAssert.assertBNEqual(await runebasepredictionToken.balanceOf(addressManager.address), 0);
     });
 
     it('can withdraw the escrow', async () => {
-      await ContractHelper.approve(bodhiToken, USER1, addressManager.address, escrowAmount);
+      await ContractHelper.approve(runebasepredictionToken, USER1, addressManager.address, escrowAmount);
       await addressManager.transferEscrow(USER1, { from: WHITELISTED_ADDRESS });
 
-      const balanceBefore = await bodhiToken.balanceOf(USER1);
+      const balanceBefore = await runebasepredictionToken.balanceOf(USER1);
 
       await addressManager.withdrawEscrow(USER1, escrowAmount, { from: WHITELISTED_ADDRESS });
-      SolAssert.assertBNEqual(await bodhiToken.balanceOf(addressManager.address), 0);
-      SolAssert.assertBNEqual(await bodhiToken.balanceOf(USER1), balanceBefore.add(escrowAmount));
+      SolAssert.assertBNEqual(await runebasepredictionToken.balanceOf(addressManager.address), 0);
+      SolAssert.assertBNEqual(await runebasepredictionToken.balanceOf(USER1), balanceBefore.add(escrowAmount));
     });
 
     it('throws if trying to withdraw from a non-whitelisted address', async () => {
-      await ContractHelper.approve(bodhiToken, USER1, addressManager.address, escrowAmount);
+      await ContractHelper.approve(runebasepredictionToken, USER1, addressManager.address, escrowAmount);
       await addressManager.transferEscrow(USER1, { from: WHITELISTED_ADDRESS });
-      SolAssert.assertBNEqual(await bodhiToken.balanceOf(addressManager.address), escrowAmount);
+      SolAssert.assertBNEqual(await runebasepredictionToken.balanceOf(addressManager.address), escrowAmount);
 
-      const balanceBefore = await bodhiToken.balanceOf(USER1);
+      const balanceBefore = await runebasepredictionToken.balanceOf(USER1);
 
       try {
         await addressManager.withdrawEscrow(USER1, escrowAmount, { from: USER1 });
@@ -329,8 +329,8 @@ contract('AdddressManager', (accounts) => {
         SolAssert.assertRevert(e);
       }
 
-      SolAssert.assertBNEqual(await bodhiToken.balanceOf(addressManager.address), escrowAmount);
-      SolAssert.assertBNEqual(await bodhiToken.balanceOf(USER1), balanceBefore);
+      SolAssert.assertBNEqual(await runebasepredictionToken.balanceOf(addressManager.address), escrowAmount);
+      SolAssert.assertBNEqual(await runebasepredictionToken.balanceOf(USER1), balanceBefore);
     });
   });
 });

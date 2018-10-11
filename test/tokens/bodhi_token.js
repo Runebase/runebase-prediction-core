@@ -1,10 +1,10 @@
-const BodhiToken = artifacts.require('./tokens/BodhiToken.sol');
+const RunebasePredictionToken = artifacts.require('./tokens/RunebasePredictionToken.sol');
 const BlockHeightManager = require('../helpers/block_height_manager');
 const Utils = require('../helpers/utils');
 const assert = require('chai').assert;
 const SolAssert = require('../helpers/sol_assert');
 
-contract('BodhiToken', (accounts) => {
+contract('RunebasePredictionToken', (accounts) => {
   const blockHeightManager = new BlockHeightManager(web3);
   const owner = accounts[0];
 
@@ -15,7 +15,7 @@ contract('BodhiToken', (accounts) => {
   afterEach(blockHeightManager.revert);
 
   beforeEach(async () => {
-    token = await BodhiToken.deployed({ from: owner });
+    token = await RunebasePredictionToken.deployed({ from: owner });
     decimals = await token.decimals.call();
   });
 

@@ -1,11 +1,11 @@
 pragma solidity ^0.4.18;
 
-import './BodhiToken.sol';
+import './RunebasePredictionToken.sol';
 
-contract CrowdsaleBodhiToken is BodhiToken {
+contract CrowdsaleRunebasePredictionToken is RunebasePredictionToken {
     uint256 public constant nativeDecimals = 18;
 
-    /// @notice 60 million BOT tokens for sale
+    /// @notice 60 million PRED tokens for sale
     uint256 public constant saleAmount = 60 * (10**6) * (10**decimals);
 
     // Crowdsale parameters
@@ -16,11 +16,11 @@ contract CrowdsaleBodhiToken is BodhiToken {
     // Events
     event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
-    /// @notice Creates new CrowdsaleBodhiToken contract
+    /// @notice Creates new CrowdsaleRunebasePredictionToken contract
     /// @param _fundingStartBlock The starting block of crowdsale
     /// @param _fundingEndBlock The ending block of crowdsale
-    /// @param _initialExchangeRate The exchange rate of Ether to BOT
-    /// @param _presaleAmount The amount of BOT that will be available for presale
+    /// @param _initialExchangeRate The exchange rate of Ether to PRED
+    /// @param _presaleAmount The amount of PRED that will be available for presale
     constructor(
         uint256 _fundingStartBlock,
         uint256 _fundingEndBlock,
@@ -32,7 +32,7 @@ contract CrowdsaleBodhiToken is BodhiToken {
         require(_fundingEndBlock >= _fundingStartBlock);
         require(_initialExchangeRate > 0);
 
-        // Converted to lowest denomination of BOT
+        // Converted to lowest denomination of PRED
         uint256 presaleAmountTokens = _presaleAmount * (10**decimals);
         require(presaleAmountTokens <= saleAmount);
 
@@ -72,12 +72,12 @@ contract CrowdsaleBodhiToken is BodhiToken {
         owner.transfer(msg.value);
     }
 
-    /// @notice Shows the amount of BOT the user will receive for amount of exchanged wei
+    /// @notice Shows the amount of PRED the user will receive for amount of exchanged wei
     /// @param _weiAmount Exchanged wei amount to convert
-    /// @param _exchangeRate Number of BOT per exchange token
-    /// @param _nativeDecimals Number of decimals of the token being exchange for BOT
-    /// @param _decimals Number of decimals of BOT token
-    /// @return The amount of BOT that will be received
+    /// @param _exchangeRate Number of PRED per exchange token
+    /// @param _nativeDecimals Number of decimals of the token being exchange for PRED
+    /// @param _decimals Number of decimals of PRED token
+    /// @return The amount of PRED that will be received
     function getTokenExchangeAmount(
         uint256 _weiAmount, 
         uint256 _exchangeRate,

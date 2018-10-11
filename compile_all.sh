@@ -1,7 +1,7 @@
 #!/bin/bash
 
-echo 'Compiling BodhiToken.sol into /build'
-solc ..=.. --optimize --bin --abi --hashes --allow-paths contracts/libs -o build --overwrite contracts/tokens/BodhiToken.sol
+echo 'Compiling RunebasePredictionToken.sol into /build'
+solc ..=.. --optimize --bin --abi --hashes --allow-paths contracts/libs -o build --overwrite contracts/tokens/RunebasePredictionToken.sol
 
 echo 'Compiling AddressManager.sol into /build'
 solc ..=.. --optimize --bin --abi --hashes --allow-paths contracts/libs,contracts/tokens -o build --overwrite contracts/storage/AddressManager.sol

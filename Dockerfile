@@ -3,7 +3,7 @@
 FROM node:8.6
 
 # create directory and add module list
-WORKDIR /bodhi-core
+WORKDIR /runebaseprediction-core
 ADD package.json package.json
 
 # install node modules

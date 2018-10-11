@@ -8,8 +8,8 @@ import "../libs/SafeMath.sol";
 contract Oracle is BaseContract, Ownable {
     using SafeMath for uint256;
 
-    bytes32 internal constant QTUM = "QTUM";
-    bytes32 internal constant BOT = "BOT";
+    bytes32 internal constant RUNEBASE = "RUNEBASE";
+    bytes32 internal constant PRED = "PRED";
 
     bool public finished;
     address public eventAddress;

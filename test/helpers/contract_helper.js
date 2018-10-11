@@ -1,20 +1,20 @@
 const AddressManager = artifacts.require('../../contracts/storage/AddressManager.sol');
-const BodhiToken = artifacts.require('../../contracts/tokens/BodhiToken.sol');
+const RunebasePredictionToken = artifacts.require('../../contracts/tokens/RunebasePredictionToken.sol');
 const EventFactory = artifacts.require('../../contracts/events/EventFactory.sol');
 const OracleFactory = artifacts.require('../../contracts/oracles/OracleFactory.sol');
 
 const Utils = require('./utils');
 
-const BOT_DECIMALS = 8;
-const BODHI_TOKENS_BALANCE = Utils.getBigNumberWithDecimals(100000, BOT_DECIMALS);
+const PRED_DECIMALS = 8;
+const RUNEBASEPREDICTION_TOKENS_BALANCE = Utils.getBigNumberWithDecimals(100000, PRED_DECIMALS);
 
 module.exports = class ContractHelper {
   static async initBaseContracts(admin, accounts) {
     const addressManager = await AddressManager.deployed({ from: admin });
 
-    const bodhiToken = await ContractHelper.mintBodhiTokens(admin, accounts);
-    await addressManager.setBodhiTokenAddress(bodhiToken.address, { from: admin });
-    assert.equal(await addressManager.bodhiTokenAddress.call(), bodhiToken.address);
+    const runebasepredictionToken = await ContractHelper.mintRunebasePredictionTokens(admin, accounts);
+    await addressManager.setRunebasePredictionTokenAddress(runebasepredictionToken.address, { from: admin });
+    assert.equal(await addressManager.runebasepredictionTokenAddress.call(), runebasepredictionToken.address);
 
     const eventFactory = await EventFactory.deployed(addressManager.address, { from: admin });
     await addressManager.setEventFactoryAddress(eventFactory.address, { from: admin });
@@ -26,41 +26,41 @@ module.exports = class ContractHelper {
 
     return {
       addressManager,
-      bodhiToken,
+      runebasepredictionToken,
       eventFactory,
       oracleFactory,
     };
   }
 
-  static async mintBodhiTokens(admin, accounts) {
-    const token = await BodhiToken.deployed({ from: admin });
-    const expectedBalance = BODHI_TOKENS_BALANCE.toString();
+  static async mintRunebasePredictionTokens(admin, accounts) {
+    const token = await RunebasePredictionToken.deployed({ from: admin });
+    const expectedBalance = RUNEBASEPREDICTION_TOKENS_BALANCE.toString();
 
-    await token.mintByOwner(accounts[0], BODHI_TOKENS_BALANCE, { from: admin });
+    await token.mintByOwner(accounts[0], RUNEBASEPREDICTION_TOKENS_BALANCE, { from: admin });
     assert.equal((await token.balanceOf(accounts[0])).toString(), expectedBalance);
 
-    await token.mintByOwner(accounts[1], BODHI_TOKENS_BALANCE, { from: admin });
+    await token.mintByOwner(accounts[1], RUNEBASEPREDICTION_TOKENS_BALANCE, { from: admin });
     assert.equal((await token.balanceOf(accounts[1])).toString(), expectedBalance);
 
-    await token.mintByOwner(accounts[2], BODHI_TOKENS_BALANCE, { from: admin });
+    await token.mintByOwner(accounts[2], RUNEBASEPREDICTION_TOKENS_BALANCE, { from: admin });
     assert.equal((await token.balanceOf(accounts[2])).toString(), expectedBalance);
 
-    await token.mintByOwner(accounts[3], BODHI_TOKENS_BALANCE, { from: admin });
+    await token.mintByOwner(accounts[3], RUNEBASEPREDICTION_TOKENS_BALANCE, { from: admin });
     assert.equal((await token.balanceOf(accounts[3])).toString(), expectedBalance);
 
-    await token.mintByOwner(accounts[4], BODHI_TOKENS_BALANCE, { from: admin });
+    await token.mintByOwner(accounts[4], RUNEBASEPREDICTION_TOKENS_BALANCE, { from: admin });
     assert.equal((await token.balanceOf(accounts[4])).toString(), expectedBalance);
 
-    await token.mintByOwner(accounts[5], BODHI_TOKENS_BALANCE, { from: admin });
+    await token.mintByOwner(accounts[5], RUNEBASEPREDICTION_TOKENS_BALANCE, { from: admin });
     assert.equal((await token.balanceOf(accounts[5])).toString(), expectedBalance);
 
-    await token.mintByOwner(accounts[6], BODHI_TOKENS_BALANCE, { from: admin });
+    await token.mintByOwner(accounts[6], RUNEBASEPREDICTION_TOKENS_BALANCE, { from: admin });
     assert.equal((await token.balanceOf(accounts[6])).toString(), expectedBalance);
 
-    await token.mintByOwner(accounts[7], BODHI_TOKENS_BALANCE, { from: admin });
+    await token.mintByOwner(accounts[7], RUNEBASEPREDICTION_TOKENS_BALANCE, { from: admin });
     assert.equal((await token.balanceOf(accounts[7])).toString(), expectedBalance);
 
-    await token.mintByOwner(accounts[8], BODHI_TOKENS_BALANCE, { from: admin });
+    await token.mintByOwner(accounts[8], RUNEBASEPREDICTION_TOKENS_BALANCE, { from: admin });
     assert.equal((await token.balanceOf(accounts[8])).toString(), expectedBalance);
 
     return token;
